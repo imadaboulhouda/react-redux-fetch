@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {
+  Component
+} from 'react';
 import './App.css';
+import { connect } from 'react-redux'; 
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component{
+   
+  componentWillMount()
+  {
+    this.getData().then(e=>{
+      
+      this.props.addData(e.results);
+    });
+  
+   
+  }
+
+   getData = async () => {
+     let x = await fetch("https://randomuser.me/api/?results=10");
+     return await x.json();
+   }
+  render()
+  {
+          return (<div className="App">
+          <header className="App-header">
+          <p>{this.props.age}</p>
+          <ul>
+          {
+            this.props.fetchData.map(x => < li > {
+                  x.email
+                } < /li>) }
+           </ul>
+          <button onClick={this.props.addAge}>Add</button>
+          <button onClick={this.props.moinAge}> Moins </button>
+          </header>
+        </div>
+        );
+  }
+
 }
 
-export default App;
+
+const mapStateToProps = (state)=>{
+  return {
+    age:state.age,
+    fetchData:state.fetchData,
+  };
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addAge:()=>dispatch({type:'AddAge'}),
+    moinAge:()=>dispatch({type:'MoinAge'}),
+    addData: (payload) => dispatch({
+      type: 'fetchData',
+      payload: payload
+    }),
+
+  }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
